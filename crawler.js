@@ -5,7 +5,8 @@ var request = require('request'),
   urlresolve = require('url').resolve,
   Promise = require('es6-promise').Promise,
   logger = require('winston'),
-  redis = require('/redis')
+  redis = require('./redis'),
+  merge = require('./utils').merge
 
 const defaultHeaders = {
   'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.124 Safari/537.36',
@@ -15,17 +16,32 @@ const defaultHeaders = {
 }
 
 function BaseCrawler(domain, options) {
-  this.options = options
+  this.options = options || {}
   this.headers = merge(defaultHeaders, this.options.headers || {})
   this.pools = {}
+  this.routes = []
 
   if (domain.indexOf('://') === -1) {
     domain = 'http://' + domain
   }
   this.uri = urlparse(domain)
+
+  if (this.options.routes) {
+    let self = this;
+    this.options.routes.forEach(function(item) {
+      self.setRoute(item[0], item[1])
+    })
+  }
 }
 
 BaseCrawler.prototype = {
+  // reg: regexp to match url
+  // cbn: callback name
+  setRoute: function(reg, cbn) {
+    this.routes.push([reg, cbn])
+    return this;
+  },
+
   router: function(url) {
     return 'index'
   },
@@ -60,9 +76,9 @@ BaseCrawler.prototype = {
         resolve(res);
       });
     });
-  }
+  },
 
-    handle: function(url) {
+  handle: function(url) {
     let cbn = this.router(url),
       self = this;
 
@@ -76,6 +92,36 @@ BaseCrawler.prototype = {
         logger.error(err);
       })
   }
+}
+
+function ctor() {}
+
+BaseCrawler.extend = function(protoProps) {
+  var child;
+
+  child = function() {
+    BaseCrawler.apply(this, arguments);
+  }
+
+  for (var prop in BaseCrawler) {
+    logger.info(prop)
+    child[prop] = BaseCrawler[prop]
+  }
+
+  ctor.prototype = BaseCrawler.prototype;
+  child.prototype = new ctor();
+
+  if (protoProps) {
+    for (var prop in protoProps) {
+      logger.info(prop)
+      child.prototype[prop] = protoProps[prop]
+    }
+  }
+
+  child.prototype.constructor = child;
+  child.__super__ = BaseCrawler.prototype;
+
+  return child;
 }
 
 module.exports = BaseCrawler

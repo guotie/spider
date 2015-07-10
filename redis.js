@@ -1,45 +1,55 @@
+'use strict';
+
 var redis = require("redis"),
-  client = redis.createClient();
+  merge = require('./utils').merge;
 
-function _get(uri) {
-  // use promise...
-  return new Promise(function(resolve, reject) {
-    client.hget('spider', uri, function(err, reply) {
-    if (err) return reject(err);
-      resolve(reply)
-    })
-  })
-}
+exports = function(port, host, options) {
+  let client = redis.createClient(port, host, options);
 
-function _set(uri) {
-  client.hset('spider', uri, {
-    'tm': Date.now()
-  })
-}
+  var r = {
+    get: function(url) {
+      return new Promise(function(resolve, reject) {
+        client.get(url, function(err, reply) {
+          if (err) return reject(err);
+          resolve(reply)
+        })
+      })
+    },
+    hget: function(ns, key) {
+      return new Promise(function(resolve, reject) {
+        client.hget(ns, key, function(err, reply) {
+          if (err) return reject(err);
+          resolve(reply)
+        })
+      })
+    },
 
-function _hkeys() {
-  return new Promise(function(resolve, reject) {
-    client.hkeys('spider', function(err, reply) {
-      if (err) return reject(err);
+    set: function(uri, value) {
+      client.set(uri, merge({
+        'tm': Date.now()
+      }, value || {}))
+    },
+    hset: function(ns, uri, value) {
+      client.hset(ns, uri, merge({
+        'tm': Date.now()
+      }, value || {}))
+    },
 
-      resolve(reply);
-    })
-  })
-}
+    del: function(key) {
+      client.del(key)
+    },
+    hdel: function(ns, key) {
+      client.hdel(ns, key)
+    },
 
-function _end() {
-  client.end()
-}
+    end: function() {
+      client.end()
+    },
+    quit: function() {
+      client.quit()
+    }
 
-exports.get = _get
-exports.set = _set
-exports.end = _end
-exports.hkeys = _hkeys
+  }
 
-exports.del = function(key) {
-  client.del(key)
-}
-
-exports.quit = function() {
-  client.quit()
+  return r;
 }

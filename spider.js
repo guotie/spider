@@ -6,7 +6,7 @@ const request = require('request'),
   Promise = require('es6-promise').Promise,
   redis = require('./redis'),
   queue = require('./queue'),
-  merge = require('/utils').merge,
+  merge = require('./utils').merge,
   logger = require('winston');
 
 var retryError = new Error('should retry')
