@@ -1,0 +1,42 @@
+{
+  "name": "spider",
+  "version": "0.1.0",
+  "description": "spider in node.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/guotie/spider.git"
+  },
+  "keywords": [
+    "spider",
+    "nodejs"
+  ],
+  "author": "guotie",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/guotie/spider/issues"
+  },
+  "homepage": "https://github.com/guotie/spider#readme",
+    "dependencies": {
+    "async": "^1.2.1",
+    "cheerio": "^0.19.0",
+    "es6-promise": "^2.3.0",
+    "graceful-fs": "^4.1.2",
+    "iconv-lite": "^0.4.10",
+    "koa": "^0.21.0",
+    "koa-router": "^5.1.2",
+    "koa-send": "^1.3.1",
+    "marked": "^0.3.3",
+    "mkdirp": "^0.5.1",
+    "pg": "^4.4.0",
+    "pg-hstore": "^2.3.2",
+    "redis": "^0.12.1",
+    "request": "^2.58.0",
+    "sequelize": "^3.3.0",
+    "to-markdown": "^1.2.1",
+    "winston": "^1.0.1"
+  }
+}
