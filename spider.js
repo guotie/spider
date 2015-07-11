@@ -7,11 +7,14 @@ const request = require('request'),
   redis = require('./redis'),
   queue = require('./queue'),
   merge = require('./utils').merge,
-  logger = require('winston');
+  logger = require('winston'),
+  MemCache = require('./memcache');
 
 var retryError = new Error('should retry')
 
 /*
+  site: a url or an array of urls, if is an array, the urls should in same domain
+
   options:
     useragent: spider request header's User-Agent
     accept: spider request header's Accept field
@@ -61,7 +64,7 @@ function Spider(site, options) {
 
   function _stop(spd) {
     spd.queue.kill()
-    redis.end()
+    spd.cache.end()
   }
 
   var crawledPages = 0
@@ -80,7 +83,7 @@ function Spider(site, options) {
 
       return items.reduce(function(seq, item, idx) {
         return seq.then(function() {
-          return redis.get(item)
+          return spdr.cache.get(item)
         }).then(function(reply) {
           if (!reply) {
             //spdr.queue.push(item)
@@ -90,10 +93,17 @@ function Spider(site, options) {
         })
       }, Promise.resolve())
     },
+
     retry: function(uri) {
       spdr.queue.push(uri)
     },
+
     start: function(crawler) {
+      spdr.cache = spdr.options.cache || new MemCache();
+
+      crawler.setCache(spdr.cache)
+      crawler.setUrl(site)
+
       _start(spdr, function(uri, cb) {
         let url = typeof uri === 'string' ? uri : uri.url;
 
@@ -116,7 +126,6 @@ function Spider(site, options) {
             cb();
           })
       });
-
 
       async.whilst(function() {
         return spdr.queue.idle() === false;
@@ -157,44 +166,6 @@ function Spider(site, options) {
   return spdr;
 }
 
-function requestp(options) {
-  return new Promise(function(resolve, reject) {
-    request(options, function(err, res, body) {
-      if (err) {
-        console.error('request failed:', err)
-        return reject(err);
-      } else if (res.statusCode !== 200) {
-        err = new Error("Unexpected status code: " + res.statusCode + " uri: " + options.url + "\n" + body);
-        //console.log(err)
-        //err.res = res;
-        return reject(err);
-      }
-      redis.set(options.url)
-      //console.log(typeof res, typeof body, res.body === body);
-      resolve(res);
-    });
-  });
-}
-
-function noop(err) {
-  throw err;
-}
-
-// memory cache
-function MemoryCache() {
-  this._cache = new Map();
-}
-
-MemoryCache.prototype.get = function(key) {
-  return this._cache.get(key);
-}
-
-MemoryCache.prototype.set = function(key, val) {
-  // body...
-  this._cache.set(key, val);
-};
-
 module.exports.Spider = Spider
 module.exports.retryError = retryError
-module.exports.MemoryCache = MemoryCache
 

@@ -3,7 +3,7 @@
 var redis = require("redis"),
   merge = require('./utils').merge;
 
-exports = function(port, host, options) {
+module.exports = function(port, host, options) {
   let client = redis.createClient(port, host, options);
 
   var r = {
@@ -25,14 +25,29 @@ exports = function(port, host, options) {
     },
 
     set: function(uri, value) {
-      client.set(uri, merge({
+      client.set(uri, merge(value || {}, {
         'tm': Date.now()
-      }, value || {}))
+      }))
     },
     hset: function(ns, uri, value) {
-      client.hset(ns, uri, merge({
+      client.hset(ns, uri, merge(value || {}, {
         'tm': Date.now()
-      }, value || {}))
+      }))
+    },
+
+    update: function(url, val) {
+      let self = this;
+
+      return this.get(url).then(function(reply) {
+        self.set(url, merge(reply, val ||{}))
+      })
+    },
+    hupdate: function(ns, key, val) {
+      let self = this;
+
+      return this.hget(ns, key).then(function(reply) {
+        self.set(key, merge(reply, val || {}))
+      })
     },
 
     del: function(key) {

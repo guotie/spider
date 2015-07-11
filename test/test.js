@@ -1,10 +1,39 @@
 var assert = require("assert")
 
-describe('Array', function() {
-  describe('#indexOf()', function () {
-    it('should return -1 when the value is not present', function () {
-      assert.equal(-1, [1,2,3].indexOf(5));
-      assert.equal(-1, [1,2,3].indexOf(0));
+describe('Crawler', function() {
+    var BaseCrawler  = require('../crawler'),
+        crawler = new BaseCrawler();
+
+    describe('#route', function() {
+        it('setRoute(regexp, string):', function() {
+            crawler.setRoute(/^\/$/, 'index')
+            crawler.setRoute(/^\/bbs/, 'detail')
+            assert.equal('index', crawler.router('/'))
+            assert.equal('detail', crawler.router('/bbs'))
+        });
+
+        it('setRoute(string, string):', function() {
+            crawler.routes = []
+            crawler.setRoute('/$', 'index')
+            crawler.setRoute('/bbs', 'detail')
+            assert.equal('index', crawler.router('/'))
+            assert.equal('detail', crawler.router('/bbs'))
+        });
+
+        it('setRoute([string, string]):', function() {
+            crawler.routes = []
+            crawler.setRoute(['/$', 'index'])
+            crawler.setRoute(['/bbs', 'detail'])
+            assert.equal('index', crawler.router('/'))
+            assert.equal('detail', crawler.router('/bbs'))
+        });
+
+        it('setRoute([[], []]):', function() {
+            crawler.routes = []
+            crawler.setRoute([['/$', 'index'], [/\/bbs/, 'detail']])
+
+            assert.equal('index', crawler.router('/'))
+            assert.equal('detail', crawler.router('/bbs'))
+        })
     });
-  });
 });
