@@ -96,14 +96,20 @@ BaseCrawler.prototype = {
   },
 
   router: function(url) {
+    let uri = urlparse(url);
+
+    if (uri.host != this.uri.host)
+      return;
+
     for (let i = 0; i < this.routes.length; i ++) {
       let rt = this.routes[i];
 
-      if (rt[0].test(url)) {
+      if (rt[0].test(uri.path)) {
         return rt[1]
       }
     }
-    return 'index'
+
+    return
   },
 
   index: function(url, resp) {
@@ -149,6 +155,8 @@ BaseCrawler.prototype = {
 
     if (!cbn) return;
     if (!self[cbn]) return;
+
+    console.log('router:', url, cbn)
 
     return self.fetch(url)
       .then(function(resp) {
