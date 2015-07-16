@@ -27,6 +27,7 @@ see examples/v2ex.js
 ### options
 
 create a spider with option:
+
     var s = new Spider(option)
 
 options:
@@ -104,6 +105,7 @@ internally, it first call router to find if there is a method to handle this url
 ### extend
 
 extend the Crawler class
+
     `js
     var MyCrawler = Crawler.extend({
         index: ...,
