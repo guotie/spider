@@ -156,8 +156,6 @@ BaseCrawler.prototype = {
     if (!cbn) return;
     if (!self[cbn]) return;
 
-    console.log('router:', url, cbn)
-
     return self.fetch(url)
       .then(function(resp) {
         return self[cbn].call(self, url, resp)
