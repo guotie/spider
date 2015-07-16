@@ -24,6 +24,16 @@ see examples/v2ex.js
 
 ## Spider
 
+### options
+
+create a spider with option:
+    var s = new Spider(option)
+
+options:
+    maxConnections: max connection conncurry
+    rps: max requests per second, if less than 1, for example 0.5, the spider request per two seconds.
+    maxPages: max pages to be crawled.
+
 ### methods:
 
 ### start

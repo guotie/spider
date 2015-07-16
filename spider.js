@@ -90,14 +90,23 @@ Spider.prototype = {
         })
         .then(function(val) {
           logger.info('crawl', url, 'complete.', val ? ' items to be crawled in this page: ' + val.length : '')
+          spdr.crawledPages ++;
+
+          if (spdr.maxPages > 0 && spdr.crawledPages > spdr.maxPages) {
+            cb()
+            return
+          }
+
           if (val)
             spdr.queue.push(val)
+
           cb()
         })
         .catch(function(err) {
-          logger.error('error occurs:', url, '\n', err, 'queue length:', spdr.queue.length())
+          logger.error('error occurs:', url, '\n', err)
           logger.error('stack:')
           logger.error(err.stack)
+
           if (err instanceof Error && err === RetryError) {
             logger.info('retry uri', url)
             spdr.retry(uri)
@@ -124,7 +133,7 @@ Spider.prototype = {
     async.whilst(function() {
       return spdr.queue.idle() === false;
     }, function(callback) {
-      logger.info('spider idle state:', spdr.queue.idle(), 'queue length:', spdr.queue.length(), 'running workers:', spdr.queue.running())
+      logger.info('-------spider queue length:', spdr.queue.length(), 'running workers:', spdr.queue.running())
       setTimeout(callback, 2000);
     }, function(err) {
       if (err) {
