@@ -153,8 +153,13 @@ BaseCrawler.prototype = {
     let cbn = this.router(url),
       self = this;
 
-    if (!cbn) return;
-    if (!self[cbn]) return;
+    if (!cbn) {
+      return Promise.reject('no callback for this url: ' + url);
+    }
+
+    if (!self[cbn]) {
+      return Promise.reject('no callback method for this url: ' + url);
+    }
 
     return self.fetch(url)
       .then(function(resp) {
