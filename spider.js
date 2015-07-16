@@ -10,7 +10,7 @@ const request = require('request'),
   logger = require('winston'),
   MemCache = require('./memcache');
 
-var retryError = new Error('should retry')
+var RetryError = new Error('should retry')
 
 /*
   site: a url or an array of urls, if is an array, the urls should in same domain
@@ -98,7 +98,7 @@ Spider.prototype = {
           logger.error('error occurs:', url, '\n', err, 'queue length:', spdr.queue.length())
           logger.error('stack:')
           logger.error(err.stack)
-          if (err instanceof Error && err === retryError) {
+          if (err instanceof Error && err === RetryError) {
             logger.info('retry uri', url)
             spdr.retry(uri)
           }
@@ -227,4 +227,4 @@ Spider.extend = function(protoProps) {
 }
 
 module.exports.Spider = Spider
-module.exports.retryError = retryError
+module.exports.RetryError = RetryError
