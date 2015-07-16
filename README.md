@@ -3,6 +3,9 @@ spider in node.js
 
 # features
 
+1 can set how many request per second
+2 can use extend to inherit
+
 # install
 
     npm install xspider
@@ -20,6 +23,8 @@ see examples/v2ex.js
 # API
 
 ## Spider
+
+### methods:
 
 ### start
     start(crawler)
@@ -50,9 +55,22 @@ pause spider.
 
 resume a paused spider.
 
+### static method
+
+### extend
+
+extend the Spider class
+    `js
+    var MySpider = Spider.extend({
+        start: ....
+    })
+
 ## Crawler
 
+### methods
+
 ### setRoute
+set crawler callbacks for specify urls.
 
 ### router
     router(url)
@@ -70,3 +88,14 @@ internal used. this method return a promise instance.
 
 this method is an interface to handle a url.
 internally, it first call router to find if there is a method to handle this url, if found, it first call fetch method, then use the method to handle to url and it's response.
+
+### static method
+
+### extend
+
+extend the Crawler class
+    `js
+    var MyCrawler = Crawler.extend({
+        index: ...,
+        detail: ...,
+    })
