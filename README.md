@@ -72,6 +72,7 @@ resume a paused spider.
 ### extend
 
 extend the Spider class
+
     `js
     var MySpider = Spider.extend({
         start: ....
