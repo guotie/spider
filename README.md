@@ -4,6 +4,7 @@ spider in node.js
 # features
 
 1 can set how many request per second
+
 2 can use extend to inherit
 
 # install
