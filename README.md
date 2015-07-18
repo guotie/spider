@@ -110,6 +110,8 @@ extend the Crawler class
 
     `js
     var MyCrawler = Crawler.extend({
-        index: ...,
-        detail: ...,
+        index: function(url, resp) { return [] },
+        detail: function(url, resp) {return [] },
     })
+
+the callback function should return an array, which is an url list to be crawled.
